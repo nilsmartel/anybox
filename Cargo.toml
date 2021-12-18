@@ -1,6 +1,6 @@
 [package]
 name = "anybox"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Nils Martel"]
 description = "Library providing a plain and simple datatype that can hold data of arbitrary type."
