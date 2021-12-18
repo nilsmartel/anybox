@@ -85,6 +85,7 @@ impl AnyBox {
         }
     }
 
+    /// Replace the value inside the box with a new value
     pub fn put<T: 'static>(&mut self, value: T) {
         let ty = any::TypeId::of::<T>();
 
