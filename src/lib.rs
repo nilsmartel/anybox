@@ -42,6 +42,8 @@ use std::any;
 
 /// Container for values of any type.
 /// When retrieving values, correct type has to be specified.
+/// TODO: I'm reasonably certain that drop leaks memory and won't drop inner vaules,
+/// creating all sorts of nastiness
 pub struct AnyBox {
     ty: any::TypeId,
     // not really pointing to values of type u8.
@@ -80,6 +82,26 @@ impl AnyBox {
                 panic!("Attempted to take value as forgein type {}", full_name);
             }
             Some(t) => t,
+        }
+    }
+
+    pub fn put<T: 'static>(&mut self, value: T) {
+        let ty = any::TypeId::of::<T>();
+
+        if ty != self.ty {
+            return;
+        }
+
+        let mut value = Box::new(value);
+        // now switch positions of the inner and passed values.
+        // That way the inner value can be properly deallocated.
+        {
+            let inner = self.value.as_mut();
+            let mut inner = unsafe {
+                std::mem::transmute::<&mut u8, &mut T>(inner)
+            };
+
+            std::mem::swap(value.as_mut(), &mut inner);
         }
     }
 }
